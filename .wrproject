@@ -71,7 +71,7 @@
             <stringAttribute key="BLD::Info|Macro|TOOL|value|zynq7k-base_ARMARCH7llvm_SMP" value="llvm"/>
             <stringAttribute key="BLD::Info|Macro|TOOL_PATH|value|zynq7k-base_ARMARCH7llvm_SMP" value="$(WIND_HOME)/compilers/llvm-13.0.1.1/$(WIND_VX7_LLVM_HOST_TYPE)/bin"/>
             <stringAttribute key="BLD::Info|Macro|CC_ARCH_SPEC|value|zynq7k-base_ARMARCH7llvm_SMP" value="-fno-builtin -mabi=aapcs -mlittle-endian --target=arm-eabi -mfpu=vfpv3 -mfloat-abi=hard -mcpu=cortex-a9"/>
-            <stringAttribute key="BLD::Info|Macro|VSB_DIR|value|zynq7k-base_ARMARCH7llvm_SMP" value="$(PRJ_ROOT_DIR)/../../../../opt/psr/zynq7k-base"/>
+            <stringAttribute key="BLD::Info|Macro|VSB_DIR|value|zynq7k-base_ARMARCH7llvm_SMP" value="$(PRJ_ROOT_DIR)/../../../../../opt/psr/zynq7k-base"/>
             <stringAttribute key="BLD::Info|Macro|VSB_CONFIG_FILE|value|zynq7k-base_ARMARCH7llvm_SMP" value="$(VSB_DIR)/h/config/vsbConfig.h"/>
             <stringAttribute key="BLD::Info|Macro|LIBPATH|value|zynq7k-base_ARMARCH7llvm_SMP" value=""/>
             <stringAttribute key="BLD::Info|Macro|LIBS|value|zynq7k-base_ARMARCH7llvm_SMP" value=""/>
@@ -131,14 +131,14 @@
         </mapAttribute>
     </attributes>
     <buildtargets>
-        <buildtarget buildtool="Linker" name="motor" passed="false" targetname="motor">
+        <buildtarget buildtool="Linker" name="psr-motor" passed="false" targetname="psr-motor">
             <contents>
-                <buildtargetreference name="/motor/motor_partialImage"/>
+                <buildtargetreference name="/psr-motor/psr-motor_partialImage"/>
             </contents>
         </buildtarget>
-        <buildtarget buildtool="Partial Image Linker" name="motor_partialImage" passed="true" targetname="motor_partialImage">
+        <buildtarget buildtool="Partial Image Linker" name="psr-motor_partialImage" passed="true" targetname="psr-motor_partialImage">
             <contents>
-                <folder name="/motor" recursive="true"/>
+                <folder name="/psr-motor" recursive="true"/>
             </contents>
         </buildtarget>
     </buildtargets>
