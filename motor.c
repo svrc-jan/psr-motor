@@ -1,11 +1,27 @@
+/**
+ * \file motor.c
+ * \author Jan Svrcina
+ * 
+ * Motor control driver for reading and decodeing ICR and managing PWM/
+*/
+
+
+
 #include "motor.h"
 #include "udp.h"
+
+
+struct psrMotor *motor; //! 
+int steps = 0;
+SEM_ID* update_sem_ptr;
 
 // driver
 LOCAL VXB_FDT_DEV_MATCH_ENTRY psrMotorMatch[] = {
     {"cvut,psr-motor", NULL},
     {} /* Empty terminated list */
 };
+
+
 
 LOCAL STATUS motorProbe(VXB_DEV_ID pInst)
 {
@@ -107,7 +123,7 @@ error:
     return ERROR;
 }
 
-struct psrMotor *motor;
+
 void motorShutdown(void)
 {
 	FPGA_PWM_DUTY(motor) = 0;	
@@ -115,7 +131,7 @@ void motorShutdown(void)
 }
 
 
-int steps = 0;
+
 
 struct psrMotor *motorInit()
 {
@@ -143,7 +159,7 @@ struct psrMotor *motorInit()
 }
 
 
-SEM_ID* update_sem_ptr;
+
 
 static void motorISR(struct psrMotor *pMotor)
 {
@@ -177,10 +193,8 @@ static void motorISR(struct psrMotor *pMotor)
 	semGive(*update_sem_ptr);
 }
 
-// void motorTask(int* pos, int *end_tasks)
 
-
-void motorRegulator(int target_steps, *pwm_duty)
+void motorRegulator(int target_steps, float *pwm_duty)
 {
 	UINT32 pwm_val;
 	

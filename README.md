@@ -33,7 +33,7 @@ The program runs in two modes **slave** and **master**. The full functionally is
 - `tUdp` - sets up UDP socket structure for communication, 
   - **slave** - sets the `target_steps` variable to the adress of recieved data, in loop receive a single integer from UDP on specified port and sets it to `target_steps`, gives signal to `update_sem`
   - **master** - in loop waits for signal from `update_sem`, sends current postion in `target_steps`
-- `tReport` - for **master** prints out current duty cycle with bar to serial port every 50 timer ticks specified in `taskDelay`
+- `tReport` - for **slave** prints out current duty cycle with bar to serial port every 50 timer ticks specified in `taskDelay`
 
 ### Driver
 The driver for the motor was mostly taken from [project assignement](https://rtime.felk.cvut.cz/psr/cviceni/semestralka/#toc-entry-12), extended by `motorShutdown` procedure.

@@ -2,6 +2,8 @@
 Makefile
 Debug/
 NoDebug/
+doxygen/html/
+doxygen/latex/
 
 #ignore binary files
 *.o
