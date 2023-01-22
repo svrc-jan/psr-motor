@@ -1,4 +1,5 @@
 #include "motor.h"
+#include "udp.h"
 
 // driver
 LOCAL VXB_FDT_DEV_MATCH_ENTRY psrMotorMatch[] = {
@@ -18,7 +19,7 @@ LOCAL STATUS motorProbe(VXB_DEV_ID pInst)
                 return ERROR;
 }
 
-void motorISR(struct psrMotor *pMotor);
+static void motorISR(struct psrMotor *pMotor);
 // Don't forget to acknowledge the interrupt in the handler by:
 // GPIO_INT_STAT(pMotor) = pMotor->gpioIrqBit;
 
@@ -106,10 +107,15 @@ error:
     return ERROR;
 }
 
-void motorShutdown(struct psrMotor *pMotor)
+struct psrMotor *motor;
+void motorShutdown(void)
 {
-	GPIO_INT_DIS(pMotor) |= pMotor->gpioIrqBit;
+	FPGA_PWM_DUTY(motor) = 0;	
+	GPIO_INT_DIS(motor) |= motor->gpioIrqBit;
 }
+
+
+int steps = 0;
 
 struct psrMotor *motorInit()
 {
@@ -119,6 +125,7 @@ struct psrMotor *motorInit()
 		return NULL;
 	}
 	
+	steps = 0; // reset step counter
 	motorProbe(motorDrv);
 	motorAttach(motorDrv);
 	
@@ -135,10 +142,10 @@ struct psrMotor *motorInit()
 	return pMotor;
 }
 
-int steps = 0;
 
+SEM_ID* update_sem_ptr;
 
-void motorISR(struct psrMotor *pMotor)
+static void motorISR(struct psrMotor *pMotor)
 {
 	static UINT32 last_A = 0, last_B = 0;
 	UINT32 curr_A, curr_B;
@@ -166,17 +173,19 @@ void motorISR(struct psrMotor *pMotor)
 	
 	last_A = curr_A;
 	last_B = curr_B;
+	
+	semGive(*update_sem_ptr);
 }
 
 // void motorTask(int* pos, int *end_tasks)
 
 
-void motorRegulator(struct psrMotor *pMotor, int target_steps)
+void motorRegulator(int target_steps)
 {
 	UINT32 pwm_val;
 	
 	if (target_steps == steps) {
-		FPGA_PWM_DUTY(pMotor) = 0;
+		FPGA_PWM_DUTY(motor) = 0;
 		return;
 	}
 	
@@ -192,20 +201,25 @@ void motorRegulator(struct psrMotor *pMotor, int target_steps)
 	if (speed > MOTOR_PWM_PERIOD - 1) speed = MOTOR_PWM_PERIOD - 1; 
 	
 	
-	FPGA_PWM_DUTY(pMotor) = pwm_val;
+	FPGA_PWM_DUTY(motor) = pwm_val;
 }
 
-void motorTask(int *target_step, int *end_tasks)
+void motorTask(SEM_ID *update_sem, int **target_step, int *end_tasks, int is_slave)
 {
-	struct psrMotor *pMotor = motorInit();
-  
-	steps = 0;
-	while(!(*end_tasks)) {
-		motorRegulator(pMotor, *target_step);
-		printf("target steps %d, steps: %d    \r", steps, *target_step);
+	motor = motorInit();
+	update_sem_ptr = update_sem;
+	printf("Starting motor task - %s\n", is_slave ? "slave" : "master");
+	
+	
+	if (is_slave) {
+		while(!(*end_tasks)) {
+			semTake(*update_sem, WAIT_FOREVER);
+			
+			motorRegulator(**target_step);
+			printf("target: %3d, current: %3d  \n", **target_step, steps);
+		}
 	}
-
-
-	FPGA_PWM_DUTY(pMotor) = 0;
-	motorShutdown(pMotor);
+	else {
+		*target_step = &steps; // do nothing, ISR updates value
+	}
 }
