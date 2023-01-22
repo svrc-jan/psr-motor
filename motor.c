@@ -135,43 +135,77 @@ struct psrMotor *motorInit()
 	return pMotor;
 }
 
-struct motor_enc {
-	int A;
-	int B;
-};
-struct motor_enc last_motor_enc = {0, 0};
-
 int steps = 0;
+
 
 void motorISR(struct psrMotor *pMotor)
 {
+	static UINT32 last_A = 0, last_B = 0;
+	UINT32 curr_A, curr_B;
 	GPIO_INT_STAT(pMotor) = pMotor->gpioIrqBit;
-	struct motor_enc curr, last = last_motor_enc;
 	
-	curr.A = (FPGA_SR(pMotor) & FPGA_SR_IRC_A_MON) ? 1 : 0;
-	curr.B = (FPGA_SR(pMotor) & FPGA_SR_IRC_B_MON) ? 1 : 0;
 	
-	if (curr.A == last.A && curr.B != last.B) {
+	curr_A = (FPGA_SR(pMotor) >> 8) & 0x1;
+	curr_B = (FPGA_SR(pMotor) >> 9) & 0x1;
+	
+	if ((curr_A == 1 && last_A == 1 && curr_B == 0 && last_B == 1) ||
+		(curr_A == 0 && last_A == 0 && curr_B == 1 && last_B == 0) ||
+		(curr_B == 1 && last_B == 1 && curr_A == 1 && last_A == 0) ||
+		(curr_B == 0 && last_B == 0 && curr_A == 0 && last_A == 1)) {
+		
 		steps++;
 	}
 	
-	if (curr.A != last.A && curr.B == last.B) {
+	if ((curr_A == 1 && last_A == 1 && curr_B == 1 && last_B == 0) ||
+		(curr_A == 0 && last_A == 0 && curr_B == 0 && last_B == 1) ||
+		(curr_B == 1 && last_B == 1 && curr_A == 0 && last_A == 1) ||
+		(curr_B == 0 && last_B == 0 && curr_A == 1 && last_A == 0)) {
+		
 		steps--;
 	}
 	
-	last_motor_enc = curr;
+	last_A = curr_A;
+	last_B = curr_B;
 }
 
+// void motorTask(int* pos, int *end_tasks)
 
-void motorTask(int *end_tasks)
+
+void motorRegulator(struct psrMotor *pMotor, int target_steps)
+{
+	UINT32 pwm_val;
+	
+	if (target_steps == steps) {
+		FPGA_PWM_DUTY(pMotor) = 0;
+		return;
+	}
+	
+	int speed;
+	// set direction
+	
+	pwm_val = (target_steps > steps) ? 0x80000000 : 0x40000000;
+	
+		
+	speed = 10*abs(target_steps - steps)+50;
+	pwm_val += speed;
+	
+	if (speed > MOTOR_PWM_PERIOD - 1) speed = MOTOR_PWM_PERIOD - 1; 
+	
+	
+	FPGA_PWM_DUTY(pMotor) = pwm_val;
+}
+
+void motorTask(int *target_step, int *end_tasks)
 {
 	struct psrMotor *pMotor = motorInit();
   
 	steps = 0;
 	while(!(*end_tasks)) {
-		printf("steps: %d    \r", steps);
-		taskDelay(50);
+		motorRegulator(pMotor, *target_step);
+		printf("target steps %d, steps: %d    \r", steps, *target_step);
 	}
 
+
+	FPGA_PWM_DUTY(pMotor) = 0;
 	motorShutdown(pMotor);
 }

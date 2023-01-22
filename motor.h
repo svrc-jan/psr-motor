@@ -63,7 +63,7 @@ struct psrMotor {
     UINT32 gpioIrqBit;
 };
 
-void motorTask(int *end_tasks);
+void motorTask(int *target_step, int *end_tasks);
 
 #endif
 
