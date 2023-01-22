@@ -17,7 +17,7 @@
 #include <sysLib.h>
 #include <semLib.h>
 
-#define MAX_BUF 100
+
 
 struct udp {
 	int sockd;
