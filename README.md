@@ -36,7 +36,7 @@ The program runs in two modes **slave** and **master**. The full functionally is
 - `tReport` - for **master** prints out current duty cycle with bar to serial port every 50 timer ticks specified in `taskDelay`
 
 ### Driver
-The driver for the motor was mostly taken from [project assignement](https://rtime.felk.cvut.cz/psr/cviceni/semestralka/](https://rtime.felk.cvut.cz/psr/cviceni/semestralka/#toc-entry-12), extended by `motorShutdown` procedure.
+The driver for the motor was mostly taken from [project assignement](https://rtime.felk.cvut.cz/psr/cviceni/semestralka/#toc-entry-12), extended by `motorShutdown` procedure.
 
 ### Diagram of parts
 Note: we are currently not using the HTTP server.
