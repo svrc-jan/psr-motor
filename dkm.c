@@ -25,6 +25,9 @@
  * 
  * The program runs in two modes **slave** and **master**. The full functionally is done using four processes (tasks). These process are communicating with each other using global variables, passed through pointers, and being synchronized by a single binary semaphore `update_sem`.
  * 
+ * \image html psr_motor.svg
+ * \image latex pst_motor.svg "Diagram" width=15cm
+ * 
  * ### Shared variables
  * 
  * - `update_sem` - binary semaphore for synchronizing the updates between tasks
