@@ -8,21 +8,20 @@
 
 
 #include "motor.h"
-#include "udp.h"
 
 
-struct psrMotor *motor; //! 
-int steps = 0;
-SEM_ID* update_sem_ptr;
+struct psrMotor *motor; //!< motor struct to handle the device
+int steps = 0;          //!< current postion step counter
+SEM_ID* update_sem_ptr; //!< pointer to global `update_sem`
 
-// driver
+//! \brief driver structure to attach motor
 LOCAL VXB_FDT_DEV_MATCH_ENTRY psrMotorMatch[] = {
     {"cvut,psr-motor", NULL},
     {} /* Empty terminated list */
 };
 
 
-
+//! \brief allocate and select device from vxb
 LOCAL STATUS motorProbe(VXB_DEV_ID pInst)
 {
         if (vxbFdtDevMatch(pInst, psrMotorMatch, NULL) == ERROR)
@@ -40,7 +39,10 @@ static void motorISR(struct psrMotor *pMotor);
 // GPIO_INT_STAT(pMotor) = pMotor->gpioIrqBit;
 
 
-
+/** \brief setup for motor, map registers, initialize IRC, map ISR
+ *  \param pInst vxb device instantance struct 
+ *  \return status of procedure
+ */
 LOCAL STATUS motorAttach(VXB_DEV_ID pInst)
 {
     struct psrMotor *pMotor;
@@ -124,6 +126,10 @@ error:
 }
 
 
+
+/**
+ * \brief shut down motor, stop interrupts and zero out PWM
+*/
 void motorShutdown(void)
 {
 	FPGA_PWM_DUTY(motor) = 0;	
@@ -132,7 +138,10 @@ void motorShutdown(void)
 
 
 
-
+/**
+ * \brief probe and attach motor, setup PWM freq and enable the counter
+ * set default values and reset global `steps` counter
+*/
 struct psrMotor *motorInit()
 {
 	VXB_DEV_ID motorDrv = vxbDevAcquireByName("pmod1", 0);
@@ -158,9 +167,12 @@ struct psrMotor *motorInit()
 	return pMotor;
 }
 
-
-
-
+/**
+ * \brief Interrup Service request handler
+ * decode ISR and increment or decrement the `steps` counter,
+ * gives signal to `update_sem`
+ * \param pMotor pointer to motor structure
+*/
 static void motorISR(struct psrMotor *pMotor)
 {
 	static UINT32 last_A = 0, last_B = 0;
@@ -193,7 +205,11 @@ static void motorISR(struct psrMotor *pMotor)
 	semGive(*update_sem_ptr);
 }
 
-
+/**
+ * \brief calculate and set the PWM duty (max. PWM counter) based on P regulator
+ * \param target_steps value the motor should reach
+ * \param pwm_duty pointer to pwm_duty value for report task
+*/
 void motorRegulator(int target_steps, float *pwm_duty)
 {
 	UINT32 pwm_val;
@@ -217,6 +233,19 @@ void motorRegulator(int target_steps, float *pwm_duty)
 	FPGA_PWM_DUTY(motor) = pwm_val;
 	*pwm_duty = (target_steps > steps) ? -(float)(speed)/MOTOR_PWM_PERIOD : (float)(speed)/MOTOR_PWM_PERIOD;
 }
+
+/**
+ * \brief initializes the motor driver, registeres the Interrupt Service Request (ISR) for the IRC encoder
+ *   - **slave** - in loop calculates and sets the PWM width, action value of the controller, using a simple P regulator based on value in `target_steps` and current step counter `steps`, waiting for signal from `update_sem`
+ *   - **master** - sets the `target_steps` variable to the adress of `steps`, 
+ * for master the target is the current position of the counter, 
+ * no loop is required, new information is passed by `motorISR`
+ * \param update_sem pointer to global synchronazition semaphore `updade_sem`
+ * \param target_step pointer to `target_step` reference
+ * \param end_task pointer to `end_task` global variable {0, 1}, signals to end all loops
+ * \param is_slave binary value assigning mode, 0 for **master**, 1 for **slave**
+ * \param pwm_dudy pointer to `pwm_duty` global variable for report task
+ */
 
 void motorTask(SEM_ID *update_sem, int **target_step, int *end_tasks, int is_slave, float *pwm_duty)
 {

@@ -6,7 +6,7 @@
 */
 
 /**
- * \mainpage # Real-Time systems programming - Motor Control
+ * \mainpage Real-Time systems programming - Motor Control
  * This is the semetral project for [Real-Time systems programming course](https://rtime.felk.cvut.cz/psr/cviceni/semestralka/) on FEE CTU.
  *
  * ## Assignement
@@ -48,7 +48,14 @@
  * 
  * ### Diagram of parts
  * Note: we are currently not using the HTTP server.
+ * 
  * ![connection](https://rtime.felk.cvut.cz/psr/cviceni/semestralka/connection.png)
+ * 
+ * ## Documentation
+ * Documentation for the project can be generated using [Doxygen](https://www.doxygen.nl/)
+ * ```
+ * doxygen dconfig
+ * ```
  */
 
 #include <vxWorks.h>
@@ -64,7 +71,7 @@
 SEM_ID update_sem; 	//!< binary synchronization semaphore
 int end_tasks;		//!< signal task to end their loops
 int *target_steps;  //!< target steps of the motor, for **slave** recieved data from UDP, for **master** current pos
-float pwm_duty;     //!< singed duty of the PWM
+float pwm_duty;     //!< singed duty of the PWM (-1, 1)
 
 
 

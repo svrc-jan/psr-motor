@@ -42,3 +42,10 @@ The driver for the motor was mostly taken from [project assignement](https://rti
 Note: we are currently not using the HTTP server.
 ![connection](https://rtime.felk.cvut.cz/psr/cviceni/semestralka/connection.png)
 
+## Documentation
+Documentation for the project can be generated using [Doxygen](https://www.doxygen.nl/)
+```
+doxygen dconfig
+```
+
+

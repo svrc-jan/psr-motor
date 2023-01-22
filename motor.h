@@ -10,6 +10,12 @@
 #include <sysLib.h>
 #include <taskLib.h>
 
+/**
+ * \file motor.h
+ * \author Jan Svrcina
+ * 
+ * Motor control driver for reading and decodeing ICR and managing PWM/
+*/
 
 // GPIO registers (TRM sect. 14 and B.19)
 #define GPIO_DATA_RO_OFFSET    0x068
@@ -53,17 +59,34 @@
 #define GPIO_INT_ANY(motor)    REGISTER((motor)->gpioRegs, GPIO_INT_ANY_OFFSET)
 #define GPIO_RAW(motor)        REGISTER((motor)->gpioRegs, GPIO_DATA_RO_OFFSET)
 
-// PWM frequency
+//! PWM frequency
 #define MOTOR_PWM_PERIOD 0xA00
 
-// Motor driver data
+//! Motor driver struct with assigned registers
 struct psrMotor {
     VIRT_ADDR fpgaRegs;
     VIRT_ADDR gpioRegs;
     UINT32 gpioIrqBit;
 };
 
+/**
+ * \brief initializes the motor driver, registeres the Interrupt Service Request (ISR) for the IRC encoder
+ *   - **slave** - in loop calculates and sets the PWM width, action value of the controller, using a simple P regulator based on value in `target_steps` and current step counter `steps`, waiting for signal from `update_sem`
+ *   - **master** - sets the `target_steps` variable to the adress of `steps`, 
+ * for master the target is the current position of the counter, 
+ * no loop is required, new information is passed by `motorISR`
+ * \param update_sem pointer to global synchronazition semaphore `updade_sem`
+ * \param target_step pointer to `target_step` reference
+ * \param end_task pointer to `end_task` global variable {0, 1}, signals to end all loops
+ * \param is_slave binary value assigning mode, 0 for **master**, 1 for **slave**
+ * \param pwm_dudy pointer to `pwm_duty` global variable for report task
+ */
 void motorTask(SEM_ID *update_sem, int **target_step, int *end_tasks, int is_slave, float *pwm_duty);
+
+
+/**
+ * \brief shut down motor, stop interrupts and zero out PWM
+*/
 void motorShutdown(void);
 
 #endif
