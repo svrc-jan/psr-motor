@@ -1,8 +1,6 @@
 /* includes */
 
 #include "vxWorks.h"
-#include "motor.h"
-
 
 
 void start(void) {
@@ -17,7 +15,7 @@ void start(void) {
 	while(1) {
 		i = (i + 1) % 5;
 		target_steps = (i - 2)*512;
-		c = (char)getchar();
+		c =	 (char)getchar();
 		
 		
 		if (c == 'q' || c == 'Q') break;
@@ -26,5 +24,4 @@ void start(void) {
 	end_tasks = 1;
 		
 }
-
 
