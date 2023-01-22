@@ -2,11 +2,11 @@
 #define UDP_H_
 
 /**
- * \file udp.c
+ * \file udp.h
  * \author Jan Svrcina
  * 
  * UDP communication
-*/
+ */
 
 
 #include "vxWorks.h"
@@ -26,9 +26,9 @@
 
 
 
-/**!
- * struct to save UDP connection info
-*/
+//!struct to save UDP connection info
+
+
 struct udp {
 	int sockd;
 	struct sockaddr_in client_addr;
