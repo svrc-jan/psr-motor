@@ -180,7 +180,7 @@ static void motorISR(struct psrMotor *pMotor)
 // void motorTask(int* pos, int *end_tasks)
 
 
-void motorRegulator(int target_steps)
+void motorRegulator(int target_steps, *pwm_duty)
 {
 	UINT32 pwm_val;
 	
@@ -200,11 +200,11 @@ void motorRegulator(int target_steps)
 	
 	if (speed > MOTOR_PWM_PERIOD - 1) speed = MOTOR_PWM_PERIOD - 1; 
 	
-	
 	FPGA_PWM_DUTY(motor) = pwm_val;
+	*pwm_duty = (target_steps > steps) ? -(float)(speed)/MOTOR_PWM_PERIOD : (float)(speed)/MOTOR_PWM_PERIOD;
 }
 
-void motorTask(SEM_ID *update_sem, int **target_step, int *end_tasks, int is_slave)
+void motorTask(SEM_ID *update_sem, int **target_step, int *end_tasks, int is_slave, float *pwm_duty)
 {
 	motor = motorInit();
 	update_sem_ptr = update_sem;
@@ -215,8 +215,7 @@ void motorTask(SEM_ID *update_sem, int **target_step, int *end_tasks, int is_sla
 		while(!(*end_tasks)) {
 			semTake(*update_sem, WAIT_FOREVER);
 			
-			motorRegulator(**target_step);
-			printf("target: %3d, current: %3d  \n", **target_step, steps);
+			motorRegulator(**target_step, pwm_duty);
 		}
 	}
 	else {

@@ -81,7 +81,6 @@ void udpTask(SEM_ID *update_sem, int **target_step, int *end_tasks, int is_slave
 		while(!(*end_tasks)) {
 			addr_len = sizeof(target_addr);
 			status = recvfrom(sockd, &pos, sizeof(pos), 0, (struct sockaddr *)&target_addr, &addr_len);
-			printf("recv %d\n", pos);
 			semGive(*update_sem);
 		}
 	}
@@ -91,7 +90,6 @@ void udpTask(SEM_ID *update_sem, int **target_step, int *end_tasks, int is_slave
 //			taskDelay(1);
 			pos = **target_step;
 			sendto(sockd, &pos, sizeof(pos), 0, (struct sockaddr *)&target_addr, sizeof(target_addr));
-			printf("sent %d\n", pos);
 		}
 	}
 	

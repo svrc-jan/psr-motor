@@ -63,7 +63,7 @@ struct psrMotor {
     UINT32 gpioIrqBit;
 };
 
-void motorTask(SEM_ID *update_sem, int **target_step, int *end_tasks, int is_slave);
+void motorTask(SEM_ID *update_sem, int **target_step, int *end_tasks, int is_slave, float *pwm_duty);
 void motorShutdown(void);
 
 #endif
