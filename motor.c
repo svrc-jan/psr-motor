@@ -216,6 +216,7 @@ void motorRegulator(int target_steps, float *pwm_duty)
 	
 	if (target_steps == steps) {
 		FPGA_PWM_DUTY(motor) = 0;
+		*pwm_duty = 0;
 		return;
 	}
 	
@@ -225,7 +226,7 @@ void motorRegulator(int target_steps, float *pwm_duty)
 	pwm_val = (target_steps > steps) ? 0x80000000 : 0x40000000;
 	
 		
-	speed = 10*abs(target_steps - steps)+50;
+	speed = 10*abs(target_steps - steps)+100;
 	pwm_val += speed;
 	
 	if (speed > MOTOR_PWM_PERIOD - 1) speed = MOTOR_PWM_PERIOD - 1; 

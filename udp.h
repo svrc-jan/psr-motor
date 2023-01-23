@@ -46,6 +46,6 @@ struct udp {
  * \param ip_address IP address of target, NULL for slave
  * \param port selected port
  */
-void udpTask(SEM_ID *update_sem, int **target_step, int *end_tasks, int is_slave, char *ip_address, int port);
+void udpTask(SEM_ID *update_sem, int **target_step, int *end_tasks, int is_slave, char *ip_address, int port, int *sockd);
 
 #endif /* UDP_H_ */

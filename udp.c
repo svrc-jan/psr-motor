@@ -89,7 +89,7 @@ struct sockaddr_in set_target_addr(char ip_addr[], int port)
  * \param ip_address IP address of target, NULL for slave
  * \param port selected port
  */
-void udpTask(SEM_ID *update_sem, int **target_step, int *end_tasks, int is_slave, char *ip_address, int port)
+void udpTask(SEM_ID *update_sem, int **target_step, int *end_tasks, int is_slave, char *ip_address, int port, int *sock_ptr)
 {
 	int pos = 0;
 	
@@ -103,6 +103,7 @@ void udpTask(SEM_ID *update_sem, int **target_step, int *end_tasks, int is_slave
 	sockd = open_udp_socket();
 	my_addr = set_my_addr(sockd, port);
 	target_addr = set_target_addr(ip_address, port);
+	*sock_ptr = sockd;
 		
 	if (is_slave) {
 		*target_step = &pos;
@@ -125,7 +126,6 @@ void udpTask(SEM_ID *update_sem, int **target_step, int *end_tasks, int is_slave
 	}
 	
 	printf("Ending udp task - %s\n", is_slave ? "slave" : "master");
-	close(sockd);
 }
 
 
