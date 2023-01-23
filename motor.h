@@ -60,11 +60,7 @@
 #define GPIO_RAW(motor)        REGISTER((motor)->gpioRegs, GPIO_DATA_RO_OFFSET)
 
 //! PWM frequency
-<<<<<<< HEAD
-#define MOTOR_PWM_PERIOD 5000
-=======
 #define MOTOR_PWM_PERIOD 5000U
->>>>>>> 79a5650c66a658154c880a34aa6c501d6e009fc0
 
 //! Motor driver struct with assigned registers
 struct psrMotor {
