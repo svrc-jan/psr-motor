@@ -1,5 +1,6 @@
 # Real-Time systems programming - Motor Control
-This is the semetral project for [Real-Time systems programming course](https://rtime.felk.cvut.cz/psr/cviceni/semestralka/) on FEE CTU.
+This is the semetral project for [Real-Time systems programming course](https://rtime.felk.cvut.cz/psr/cviceni/semestralka/) on FEE CTU by Jan Svrcina and Suphi Deniz Karanfil.  
+Github repository https://github.com/svrc-jan/psr-motor/.
 
 ## Assignement
 The goal of the semestral work is to create a digital motor controller. This program controls the position of the motor according to the set-point given by the position of another motor, moved by hand (steer-by-wire). The set-point will be transferred between the two motor controllers using UDP messages.
@@ -24,7 +25,7 @@ Simple text output bar is showing the duty of the PWM is send via serial port of
 
 The program runs in two modes **slave** and **master**. The full functionally is done using four processes (tasks). These process are communicating with each other using global variables, passed through pointers, and being synchronized by a single binary semaphore `update_sem`.
 
-![slave_mode](image/psr_motor.svg)
+![diagram](./image/psr_motor.png)
 
 ### Shared variables
 
