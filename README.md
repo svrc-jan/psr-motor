@@ -13,6 +13,13 @@ start <ip address> <port> # to start master
 start "" <port>           # to start slave
 ```
 
+## User interface
+Simple text output bar is showing the duty of the PWM is send via serial port of the **slave**.
+```
+-0.523 | ---------.......... |
+ 0.312 | +++................ |
+```
+
 ## Solution description
 
 The program runs in two modes **slave** and **master**. The full functionally is done using four processes (tasks). These process are communicating with each other using global variables, passed through pointers, and being synchronized by a single binary semaphore `update_sem`.

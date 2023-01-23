@@ -20,6 +20,12 @@
  * start <ip address> <port> # to start master
  * start "" <port>           # to start slave
  * ```
+ * ## User Interface
+ * Simple text output bar is showing the duty of the PWM is send via serial port of the **slave**.
+ * ```
+ * -0.523 | ---------.......... |
+ *  0.312 | +++................ |
+ * ```
  * 
  * ## Solution description
  * 
@@ -102,7 +108,7 @@ void reportTask()
  * \brief entry point of the program, sets up global variable to their initial state, 
  * selects the mode based on input, starts up other tasks, waits in loop to recieve `q` or `Q` 
  * to signal the other tasks to end, cleans motor structure at the end
- * \param ip_address string specifying target for **master** and `""` or `NULL` for slave
+ * \param ip_address string specifying target for **master** and `""` or `NULL` for **slave**
  * \param port selected port for UDP communication
  */
 void start(char *ip_address, int port) {
