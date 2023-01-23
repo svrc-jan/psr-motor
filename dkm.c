@@ -90,14 +90,14 @@ float pwm_duty;     //!< singed duty of the PWM (-1, 1)
 #define BAR_SIZE 20
 void reportTask()
 {
-	char buf[BAR_SIZE+1];
-	buf[BAR_SIZE] = '\0';
+	char buf[BAR_SIZE];
+	buf[BAR_SIZE-1] = '\0';
 	while(!end_tasks) {	
-		int i, k = round(abs(BAR_SIZE*pwm_duty));
+		int i, k = ceil(abs(BAR_SIZE*pwm_duty));
 		char sign = (pwm_duty >= 0) ? '+' : '-';
 		
 		for (i = 0; i < k; i++) buf[i] = sign;
-		for ( ; i < BAR_SIZE; i++) buf[i] = '.';
+		for ( ; i < BAR_SIZE-1; i++) buf[i] = '.';
 				
 		printf("%5.3f | %s |  \r", pwm_duty, buf);
 		taskDelay(50);
